@@ -1,0 +1,24 @@
+agent Main {
+    module EIS ei;
+    module Console C;
+    module System S;
+    module Routing Routing;
+
+    rule +!main(list args) {
+        ei.launch("hw","dependency/vacuumworld-1.2.0.jar");
+
+        ei.init([generation("no"), level("4")]);
+
+        ei.start();
+
+        list entities = ei.freeEntities();
+        forall(string entity : entities) {
+            S.createAgent(entity, "VacBot");
+            S.setMainGoal(entity, [entity]);
+        }
+
+
+        S.sleep(10000);
+        S.exit();
+    }
+}

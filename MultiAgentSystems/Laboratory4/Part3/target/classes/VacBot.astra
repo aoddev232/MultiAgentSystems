@@ -1,0 +1,125 @@
+agent VacBot{
+
+    types vac{
+        formula task(string);
+        formula location(long,long);
+        formula free(string);
+        formula updateBoundary(long,long);
+        formula route(list);
+        formula go(funct,string);
+        formula direction(string);
+    }
+    module EIS ei;
+    module Console C;
+    module System S;
+    module Routing r;
+    module Math m;
+
+
+    inference free(string position) :- ei.square(position, "empty") | ei.square(position, "dust");
+
+    initial route([]);
+
+    rule +!main([string vacbot]){
+        ei.join("hw");
+        ei.link(vacbot);
+        C.println("VacBot activated");
+    }
+
+    rule +$ei.event(location(long X,long Y)){
+        +location(X,Y);
+        !task(string action);
+    }
+
+    rule +$ei.event(direction(string D)){
+        +direction(D);
+    }
+
+    rule +!task(string action): ei.square("here","dust"){
+        ei.clean();
+        //action = "clean";
+        !task(action);
+    }
+
+    rule +!task(string action): ei.square("forward","dust"){
+        ei.move("forward");
+        action = "move";
+    }
+
+    rule +!task(string action): ei.square("left","dust"){
+        ei.move("left");
+        action = "move";
+    }
+
+    rule +!task(string action): ei.square("right","dust"){
+        ei.move("right");
+        action = "move";
+    }
+
+    rule +!task(string action): free("forward"){
+        ei.move("forward");
+        action = "move";
+    }
+
+    rule +!task(string action): free("left"){
+        ei.move("left");
+        action = "move";
+    }
+
+    rule +!task(string action): free("right"){
+        ei.move("right");
+        action = "move";
+    }
+
+    rule +!task(string action){
+        ei.move("right");
+        action = "move";
+        ei.move("right");
+        action = "move";
+    }
+
+    rule +!update(){
+        query(location(long X,long Y));
+        query(direction(string D));
+
+        foreach(ei.square(string location,"obstacle") & ~r.obstacle(X,Y,D,location)){
+            r.recordObstacle(X,Y,D,location);
+    }
+
+        r.updateBoundary(7l,4l);
+        long maxX = r.maxX();
+        long maxY = r.maxY();
+        C.println("Boundary Updated");
+    }
+
+    rule +!task(string action): route([]){
+        !update();
+        query(location(long sx,long sy));
+
+        long tx = (m.randomInt() % r.maxX()) * 1l;
+        long ty = (m.randomInt() % r.maxY()) * 1l;
+        list L = r.routeTo(sx,sy,tx,ty);
+        S.sleep(1000);
+        C.println("L=" + L);
+        r.displayMap();
+
+        -route([]);
+        +route(L);
+        !task(action);
+    }
+
+    rule +!task(string action) : route([funct move]){
+        -route([move]);
+        !go(move, action);
+    }
+
+    rule +!task(string action) : route([funct move|list L]){
+        -+route(L);
+        !go(move, action);
+    }
+
+    rule +!go(move(string direction),string action){
+        ei.move(direction);
+        action = direction;
+    }
+}

@@ -1,0 +1,45 @@
+agent Main {
+    module Console c;
+    module System s;
+    types ls {
+        formula switch(string, string);
+        formula light(string, string);
+        formula transition(string, string);
+    }
+
+    initial light("l1", "off");
+    initial switch("s1", "off");
+    initial transition("on", "off");
+    initial transition("off", "on");
+
+    rule +switch(string sname, string X) : light(string lname, string Y) {
+        !light(lname, X);
+    }
+
+    rule +!light(string lname, string state) : light(lname, state) {}
+
+    rule +!light(string lname, string state) : light(lname, string state2) {
+        -light(lname, state2);
+        +light(lname, state);
+    }
+
+    rule +light(string lname, string state){
+        c.println("Light: " + lname + " is in state: " + state);
+    }
+
+    rule +!flash(0) {
+        s.exit();
+    }
+
+    rule +!flash(int N) : N > 0 & N <= 10 & switch(string sname, string stateX) & transition(stateX, string stateY){
+        //Logic
+        -+switch("s1", stateY);
+        s.sleep(1000);
+        //Recursive Call with N-1
+        !flash(N-1);
+    }
+
+    rule +!main(list args) {
+        !flash(10);
+    }
+}

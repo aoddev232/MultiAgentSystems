@@ -1,0 +1,23 @@
+agent Main extends Player{
+    module Console C;
+
+    // initial turn("O");
+
+    rule +!main(list args) {
+        if (winner(string X)){
+            C.println("Player X has won");
+        }
+        if (loser(string O)){
+            C.println("Player O has lost");
+        }
+        if(drawn()){
+            C.println("Draw");
+        }
+        if(free(int L)){
+            C.println("First free location is: " + L);
+        }
+        if (~played(string T, int L)){
+            C.println("Game has not Started");
+        }
+    }
+}

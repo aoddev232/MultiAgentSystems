@@ -1,0 +1,80 @@
+agent Player{
+    //Modules
+    module Console console;
+
+    //Types
+    types ls{
+        formula location(int);
+        formula player(string);
+        formula line(int, int, int);
+        formula free(int);
+        formula winner(string);
+        formula loser(string);
+        formula drawn();
+        formula opponent(string, string);
+        formula played(string, int);
+        formula turn(string);
+    }
+
+    // Locations
+    initial location(1), location(2), location(3), location(4), location(5), location(6), location(7), location(8), location(9);
+
+    // Winning lines
+    initial line(1, 2, 3), line(1, 5, 9), line(1, 4, 7), line(2, 5, 8), line(3, 6, 9), line(3, 5, 7), line(4, 5, 6), line(7, 8, 9);
+
+    // Players
+    initial player("X"), player("O");
+
+    // Configurations:
+    // Player O wins:
+    // initial played("X", 1);
+    // initial played("Y", 4);
+    // initial played("X", 2);
+    // initial played("Y", 5);
+    // initial played("X", 3);
+
+    // Inferences
+    inference free(int L) :- location(L) & ~played(string P, L);
+    inference winner(string P) :- line(int L1, int L2, int L3) & played(P, L1) & played(P, L2) & played(P, L3);
+    inference loser(string P) :- player(P) & winner(string O) & P ~= O;
+    inference drawn() :- ~free(int L) & ~winner(string O);
+    inference opponent(string P, string O) :- player(O) & O ~= P;
+
+    // Making a move
+    rule +turn(string P) : player(P) & opponent(P, string O){
+        !move(int L);
+        !played(P, L);
+        !turn(O);
+    }
+
+    rule +!turn(string O) : turn(string P) & winner(string W){
+        -turn(P);
+        console.println("Winner: " + W);
+    }
+
+    rule +!turn(string O) : turn(string P) & drawn(){
+        -turn(P);
+        console.println("Drawn!");
+    }
+
+    rule +!turn(string O) : turn(string P){
+        -+turn(O);
+    }
+
+    rule +!played(string P, int L) : free(L){
+        +played(P, L);
+    }
+
+    rule+played(string P, int L) {
+        console.println("Player " + P + " played at location: " + L);
+    }
+    
+    rule +!move(int L) : free(1){
+        L=1;
+    }
+
+    // Player move selection strategy...
+    // rule +!move() : free(int N){
+    //     +move(N);
+    // }
+}

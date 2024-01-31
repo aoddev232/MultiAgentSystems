@@ -1,0 +1,107 @@
+agent Player{
+    //Modules
+    module Console console;
+
+    //Types
+    types ls{
+        formula location(int);
+        formula player(string);
+        formula line(int, int, int);
+        formula free(int);
+        formula winner(string);
+        formula loser(string);
+        formula drawn();
+        formula opponent(string);
+        formula played(string, int);
+        formula turn(string);
+    }
+
+    // Locations
+    initial location(1), location(2), location(3), location(4), location(5), location(6), location(7), location(8), location(9);
+
+    // Winning lines
+    initial line(1, 2, 3), line(1, 5, 9), line(1, 4, 7), line(2, 5, 8), line(3, 6, 9), line(3, 5, 7), line(4, 5, 6), line(7, 8, 9);
+
+    // Inferences
+    inference free(int L) :- location(L) & ~played(string P, L);
+    inference winner(string P) :- line(int L1, int L2, int L3) & played(P, L1) & played(P, L2) & played(P, L3);
+    inference loser(string P) :- player(P) & winner(string O) & P ~= O;
+    inference drawn() :- ~free(int L) & ~winner(string O);
+
+    rule +turn(string P) : winner(string W){
+        -turn(P);
+        console.println("Winner: " + W);
+    }
+
+    rule +turn(string P) : drawn(){
+        -turn(P);
+        console.println("Drawn!");
+    }
+
+    rule +turn(string P) : player(P) & opponent(string opp){
+        -turn(P);
+        !move(int L);
+        !played(P, L);
+        send(inform, opp, played(P, L));
+    }
+
+    rule +!played(string P, int L) : free(L) & opponent(string opp){
+        +played(P, L);
+    }
+
+    rule+played(string P, int L) {
+        console.println("Player " + P + " played at location: " + L);
+    }
+    
+    rule +!move(int L) : free(1){
+        L=1;
+    }
+
+    rule +!move(int L) : free(2){
+        L=2;
+    }
+
+    rule +!move(int L) : free(3){
+        L=3;
+    }
+
+    rule +!move(int L) : free(4){
+        L=4;
+    }
+
+    rule +!move(int L) : free(5){
+        L=5;
+    }
+
+    rule +!move(int L) : free(6){
+        L=6;
+    }
+
+    rule +!move(int L) : free(7){
+        L=7;
+    }
+
+    rule +!move(int L) : free(8){
+        L=8;
+    }
+
+    rule +!move(int L) : free(9){
+        L=9;
+    }
+
+    //Communication
+    rule @message(inform, string sender, played(string P, int L)) : player(string O) & O ~= P{
+        -turn(P);
+        +played(P, L);
+        +turn(O);
+    }
+
+    rule +!main([string token, string opponent, boolean turn]) {
+        +player(token);
+        +opponent(opponent);
+        if(turn == true){
+            +turn(token);
+        }
+        console.println("Created Player " + token + ", Turn: " + turn);
+    }
+}

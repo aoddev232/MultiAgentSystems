@@ -1,0 +1,9 @@
+agent Main {
+    module Console console;
+
+    initial !init();
+
+    rule +!init() {
+        console.println("Hello, World!");
+    }
+}

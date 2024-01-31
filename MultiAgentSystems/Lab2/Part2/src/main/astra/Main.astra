@@ -1,0 +1,31 @@
+agent Main {
+    module Console c;
+    types ls {
+        formula switch(string, string);
+        formula light(string, string);
+    }
+
+    initial light("l1", "off");
+    initial light("l2", "on");
+    initial switch("s1", "on");
+
+    rule +switch(string switch, string state) {
+        !light("l1", state);
+        !light("l2", state);
+    }
+
+    rule +!light(string lname, string state) : light(lname, state) {}
+
+    rule +!light(string lname, string state) : light(lname, string state2) {
+        -light(lname, state2);
+        +light(lname, state);
+    }
+
+    rule +light(string lname, string state){
+        c.println("Light: " + lname + " is in state: " + state);
+    }
+
+    rule +!main(list args) {
+        +switch("s1", "on");
+    }
+}

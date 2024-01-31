@@ -1,0 +1,69 @@
+agent Main {
+    module Console console;
+    module System system;
+
+    types ls {
+        formula switch(string);
+        formula light(string, string);
+        formula transition(string, string);
+        formula light_threshold(int);
+        formula light_level(int);
+        formula hour_light(int, int);
+    }
+
+    initial switch("on");
+    initial light("l1", "off");
+    initial transition("on", "off");
+    initial transition("off", "on");
+    initial light_threshold(750);
+    initial hour_light(0, 1), hour_light(1, 1), hour_light(2, 1), hour_light(3, 1), hour_light(4, 1), hour_light(5, 1), hour_light(6, 100), hour_light(7, 250), hour_light(8, 400), hour_light(9, 900), hour_light(10, 1000), hour_light(11, 1000), hour_light(12, 1000), hour_light(13, 1000), hour_light(14, 1000), hour_light(15, 800), hour_light(16, 700), hour_light(17, 600), hour_light(18, 600), hour_light(19, 400), hour_light(20, 100), hour_light(21, 100), hour_light(22, 1), hour_light(23, 1);
+
+    rule +switch("on") : light_level(int lux) & light_threshold(int threshold) & lux > threshold {}
+
+    rule +switch(string state) {
+        !light("l1", state);
+    }
+
+    rule +!light(string lt, string state) : light(lt, state) {}
+
+    rule +!light(string lt, string stateX) : light(lt, string stateY) {
+        -light(lt, stateY);
+        +light(lt, stateX);
+    }
+
+    rule +light(string lt, string state) {
+        console.println("Light: " + lt + " is in state: " + state);
+    }
+
+    rule +light_level(int lux) : switch("on") & light(string lt, "off") & light_threshold(int threshold) & lux < threshold  {
+        !light(lt, "on");
+    }
+    
+    rule +light_level(int lux) : switch("on") & light(string lt, "on") & light_threshold(int threshold) & lux > threshold {
+        !light(lt, "off");
+    }
+
+    rule +!day_simulation(24) {}
+
+    rule +!day_simulation(int hour) : hour_light(hour, int lux) {
+        console.println("Hour:" + hour + "    Light Level:" + lux);
+        -+light_level(lux);
+        system.sleep(1000);
+        !switch_simulation(hour);
+        !day_simulation(hour+1);
+    }
+
+    rule +!switch_simulation(10) {
+        -+switch("on");
+    } 
+
+    rule +!switch_simulation(18) {
+        -+switch("off");
+    }
+
+    rule +!switch_simulation(int hour) {}
+
+    rule +!main(list args) {
+        !!day_simulation(0);
+    }
+}

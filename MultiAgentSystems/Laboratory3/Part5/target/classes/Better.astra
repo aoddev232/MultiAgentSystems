@@ -1,0 +1,166 @@
+agent Better extends Player{
+    module Console C;
+
+    //Firstly, try and control the center of the board as it provides the most opprotunities and therefore the best chance of winning
+    rule +!move(int L) : free(5){
+        L=5;
+    } 
+
+    //Next, If there is a win condition take it:
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 1) & played(P, 3) & free(2){
+        L=2;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 1) & played(P, 7) & free(4){
+        L=4;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 7) & played(P, 9) & free(8){
+        L=8;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 9) & played(P, 3) & free(6){
+        L=6;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 1) & played(P, 5) & free(9){
+        L=9;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 3) & played(P, 5) & free(7){
+        L=7;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 7) & played(P, 5) & free(3){
+        L=3;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 9) & played(P, 5) & free(1){
+        L=1;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 1) & played(P, 2) & free(3){
+        L=3;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 2) & played(P, 3) & free(1){
+        L=1;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 4) & played(P, 5) & free(6){
+        L=6;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 5) & played(P, 6) & free(4){
+        L=4;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 7) & played(P, 8) & free(9){
+        L=9;
+    }
+
+    rule +!move(int L): o_token(string O) & player(string P) & O ~= P & played(P, 8) & played(P, 9) & free(7){
+        L=7;
+    }
+
+    //Block Opponent from winning by detecting if they have 2 in a row and blocking the third spot
+    rule +!move(int L) : o_token(string O) & played(O, 1) & played(O, 2) & free(3){
+        L=3;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 2) & played(O, 3) & free(1){
+        L=1;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 1) & played(O, 3) & free(2){
+        L=2;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 3) & played(O, 6) & free(9){
+        L=9;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 3) & played(O, 9) & free(6){
+        L=6;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 6) & played(O, 9) & free(3){
+        L=3;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 1) & played(O, 4) & free(7){
+        L=7;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 1) & played(O, 7) & free(4){
+        L=4;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 4) & played(O, 7) & free(1){
+        L=1;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 7) & played(O, 8) & free(9){
+        L=9;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 7) & played(O, 9) & free(8){
+        L=8;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 8) & played(O, 9) & free(7){
+        L=7;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 5) & played(O, 2) & free(8){
+        L=8;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 5) & played(O, 6) & free(4){
+        L=4;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 5) & played(O, 8) & free(2){
+        L=2;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 5) & played(O, 4) & free(6){
+        L=6;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 1) & played(O, 5) & free(9){
+        L=9;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 9) & played(O, 5) & free(1){
+        L=1;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 3) & played(O, 5) & free(7){
+        L=7;
+    }
+
+    rule +!move(int L) : o_token(string O) & played(O, 7) & played(O, 5) & free(3){
+        L=3;
+    }
+
+
+    //Control The corners. After the center, the corners are the next best moves. 
+    //Placing your mark in a corner increases your chances of winning and reduces your opponent's opportunities
+
+    rule +!move(int L) : free(1){
+        L=1;
+    }
+
+    rule +!move(int L) : free(7){
+        L=7;
+    }
+
+    rule +!move(int L) : free(9){
+        L=9;
+    }
+
+    rule +!move(int L) : free(3){
+        L=3;
+    }
+}
